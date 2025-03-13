@@ -154,7 +154,7 @@ public class ArbolAVL<T extends Comparable<T>> {
   }
 
   private NodoAVL<T> rota(NodoAVL<T> actual) {
-    NodoAVL<T> alfa, beta, gamma, A, B, C, D;
+    NodoAVL<T> alfa, beta, gamma, B, C;
     if (actual.getFactorEquilibrio() == -2 && actual.getIzq().getFactorEquilibrio() <= 0) { // Caso izq-izq
       alfa = actual;
       beta = alfa.getIzq();
@@ -203,10 +203,8 @@ public class ArbolAVL<T extends Comparable<T>> {
       alfa = actual;
       beta = alfa.getDer();
       gamma = beta.getIzq();
-      A = alfa.getIzq();
       B = gamma.getIzq();
       C = gamma.getDer();
-      D = beta.getDer();
 
       gamma.setIzq(alfa);
       alfa.setPapa(gamma);
