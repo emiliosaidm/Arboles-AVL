@@ -153,8 +153,72 @@ public class ArbolAVL<T extends Comparable<T>> {
 
   }
 
-  private NodoAVL<T> rota(NodoAVL<T> nodo) {
-    return nodo;
+  private NodoAVL<T> rota(NodoAVL<T> actual) {
+    NodoAVL<T> alfa, beta, gamma, A, B, C, D;
+    if (actual.getFactorEquilibrio() == -2 && actual.getIzq().getFactorEquilibrio() <= 0) { // Caso izq-izq
+      alfa = actual;
+      beta = alfa.getIzq();
+      gamma = beta.getIzq();
+      C = beta.getDer();
+
+      beta.setDer(alfa);
+      alfa.setPapa(beta);
+      alfa.setIzq(C);
+      C.setPapa(alfa);
+
+      return beta;
+    } else if (actual.getFactorEquilibrio() == 2 && actual.getDer().getFactorEquilibrio() > 0) { // Caso der-der
+      alfa = actual;
+      beta = alfa.getDer();
+      gamma = beta.getDer();
+      B = beta.getIzq();
+
+      beta.setIzq(alfa);
+      alfa.setPapa(beta);
+
+      alfa.setDer(B);
+      B.setPapa(alfa);
+
+      return beta;
+    } else if (actual.getFactorEquilibrio() == -2 && actual.getIzq().getFactorEquilibrio() > 0) { // izq-der
+      alfa = actual;
+      beta = alfa.getIzq();
+      gamma = beta.getDer();
+      B = gamma.getIzq();
+      C = gamma.getDer();
+
+      gamma.setIzq(beta);
+      beta.setPapa(gamma);
+      gamma.setDer(alfa);
+      alfa.setPapa(gamma);
+
+      beta.setDer(B);
+      B.setPapa(beta);
+
+      alfa.setIzq(C);
+      C.setPapa(alfa);
+
+      return gamma;
+    } else { // Caso der-izq
+      alfa = actual;
+      beta = alfa.getDer();
+      gamma = beta.getIzq();
+      A = alfa.getIzq();
+      B = gamma.getIzq();
+      C = gamma.getDer();
+      D = beta.getDer();
+
+      gamma.setIzq(alfa);
+      alfa.setPapa(gamma);
+      gamma.setDer(beta);
+      beta.setPapa(gamma);
+      alfa.setDer(B);
+      B.setPapa(alfa);
+      beta.setIzq(C);
+      C.setPapa(beta);
+
+      return gamma;
+    }
   }
 
   public NodoAVL<T> busca(T elem) {
