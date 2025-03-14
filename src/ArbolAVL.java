@@ -47,9 +47,9 @@ public class ArbolAVL<T extends Comparable<T>> {
 
     // Determinar si el nodo va a la derecha o izquierda del papa.
     if (papa.getDato().compareTo(elem) <= 0) {
-      papa.setIzq(nuevo);
-    } else {
       papa.setDer(nuevo);
+    } else {
+      papa.setIzq(nuevo);
     }
     nuevo.setPapa(papa);
     cont++;
@@ -70,6 +70,14 @@ public class ArbolAVL<T extends Comparable<T>> {
       else if (Math.abs(papa.getFactorEquilibrio()) == 2) {
         // En este caso, ya habría un árbol desbalanceado. Por lo que hay que rotar.
         papa = rota(papa);
+        if (papa.getPapa() == null)
+          raiz = papa;
+        else {
+          if (papa.getPapa().getDato().compareTo(papa.getDato()) > 0)
+            papa.getPapa().setIzq(papa);
+          else
+            papa.getPapa().setDer(papa);
+        }
         termine = true;
       }
       actual = papa;
@@ -154,8 +162,9 @@ public class ArbolAVL<T extends Comparable<T>> {
   }
 
   private NodoAVL<T> rota(NodoAVL<T> actual) {
-    NodoAVL<T> alfa, beta, gamma, B, C;
+    NodoAVL<T> alfa, beta, gamma, B, C, raiz;
     if (actual.getFactorEquilibrio() == -2 && actual.getIzq().getFactorEquilibrio() <= 0) { // Caso izq-izq
+      System.out.println("Caso izq-izq");
       alfa = actual;
       beta = alfa.getIzq();
       gamma = beta.getIzq();
@@ -164,10 +173,15 @@ public class ArbolAVL<T extends Comparable<T>> {
       beta.setDer(alfa);
       alfa.setPapa(beta);
       alfa.setIzq(C);
-      C.setPapa(alfa);
 
-      return beta;
+      if (C != null)
+        C.setPapa(alfa);
+
+      beta.setPapa(null);
+
+      raiz = beta;
     } else if (actual.getFactorEquilibrio() == 2 && actual.getDer().getFactorEquilibrio() > 0) { // Caso der-der
+      System.out.println("Caso der-der");
       alfa = actual;
       beta = alfa.getDer();
       gamma = beta.getDer();
@@ -177,10 +191,14 @@ public class ArbolAVL<T extends Comparable<T>> {
       alfa.setPapa(beta);
 
       alfa.setDer(B);
-      B.setPapa(alfa);
+      if (B != null)
+        B.setPapa(alfa);
 
-      return beta;
+      beta.setPapa(null);
+
+      raiz = beta;
     } else if (actual.getFactorEquilibrio() == -2 && actual.getIzq().getFactorEquilibrio() > 0) { // izq-der
+      System.out.println("Caso izq-der");
       alfa = actual;
       beta = alfa.getIzq();
       gamma = beta.getDer();
@@ -193,13 +211,18 @@ public class ArbolAVL<T extends Comparable<T>> {
       alfa.setPapa(gamma);
 
       beta.setDer(B);
-      B.setPapa(beta);
+      if (B != null)
+        B.setPapa(beta);
 
       alfa.setIzq(C);
-      C.setPapa(alfa);
+      if (C != null)
+        C.setPapa(alfa);
 
-      return gamma;
+      gamma.setPapa(null);
+
+      raiz = gamma;
     } else { // Caso der-izq
+      System.out.println("Caso der-izq");
       alfa = actual;
       beta = alfa.getDer();
       gamma = beta.getIzq();
@@ -211,12 +234,24 @@ public class ArbolAVL<T extends Comparable<T>> {
       gamma.setDer(beta);
       beta.setPapa(gamma);
       alfa.setDer(B);
-      B.setPapa(alfa);
-      beta.setIzq(C);
-      C.setPapa(beta);
 
-      return gamma;
+      if (B != null)
+        B.setPapa(alfa);
+
+      beta.setIzq(C);
+
+      if (C != null)
+        C.setPapa(beta);
+
+      gamma.setPapa(null);
+
+      raiz = gamma;
     }
+
+    // La raiz es el nodo que se encuentra en la cima de la rotación. Actualizamos
+    // el fe de este subárbol.
+    actualizaFe(raiz);
+    return raiz;
   }
 
   public NodoAVL<T> busca(T elem) {
@@ -237,6 +272,61 @@ public class ArbolAVL<T extends Comparable<T>> {
       return busca(actual.getIzq(), elem);
     else
       return busca(actual.getDer(), elem);
+
+  }
+
+  private void actualizaFe(NodoAVL<T> actual) {
+    if (actual == null)
+      return;
+
+    actualizaFe(actual.getIzq());
+    actualizaFe(actual.getDer());
+
+    int feIzq = actual.getIzq() == null ? 0 : altura(actual.getIzq());
+    int feDer = actual.getDer() == null ? 0 : altura(actual.getDer());
+
+    actual.setFactorEquilibrio(feDer - feIzq);
+  }
+
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    toString(raiz, builder, "", "");
+    return builder.toString();
+  }
+
+  private void toString(NodoAVL<T> actual,
+      StringBuilder builder,
+      String prefix,
+      String childrenPrefix) {
+    if (actual != null) {
+      builder.append(prefix);
+      builder.append(actual.getDato() + " fe: " + actual.getFactorEquilibrio());
+      builder.append("\n");
+
+      toString(actual.getIzq(), builder, childrenPrefix, childrenPrefix);
+      toString(actual.getDer(), builder, childrenPrefix, childrenPrefix);
+    }
+
+  }
+
+  private int altura(NodoAVL<T> actual) {
+    if (actual == null) {
+      return 0;
+    }
+
+    int izq = altura(actual.getIzq());
+    int der = altura(actual.getDer());
+
+    return 1 + Math.max(izq, der);
+  }
+
+  public static void main(String[] args) {
+    ArbolAVL<Integer> arbol = new ArbolAVL();
+    arbol.insertar(1);
+    arbol.insertar(2);
+    arbol.insertar(3);
+
+    System.out.println(arbol.toString());
 
   }
 
