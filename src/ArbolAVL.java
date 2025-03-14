@@ -38,7 +38,7 @@ public class ArbolAVL<T extends Comparable<T>> {
       else
         encontre = true;
     }
-    // Si se encontro el elemento, lo omitimos la inserción.
+    // Si se encontro el elemento, omitimos la inserción.
     if (encontre)
       throw new RuntimeException("Ya existe ese elemento");
 
@@ -74,7 +74,6 @@ public class ArbolAVL<T extends Comparable<T>> {
         // Nueva raiz del subárbol, después de la rotación. Este logra balancear el
         // árbol.
         NodoAVL<T> nuevaRaiz = rota(papa);
-        System.out.println("papa de papa: " + (papaDePapa != null ? papaDePapa.getDato() : "null"));
         if (papaDePapa == null)
           raiz = nuevaRaiz;
         else {
@@ -160,9 +159,23 @@ public class ArbolAVL<T extends Comparable<T>> {
 
       if (Math.abs(papa.getFactorEquilibrio()) == 1)
         termine = true;
-      else if (Math.abs(papa.getFactorEquilibrio()) == 2)
-        papa = rota(papa);
+      else if (Math.abs(papa.getFactorEquilibrio()) == 2) {
+        // En este caso, ya habría un árbol desbalanceado. Por lo que hay que rotar.
+        NodoAVL<T> papaDePapa = papa.getPapa();
+        // Nueva raiz del subárbol, después de la rotación. Este logra balancear el
+        // árbol.
+        NodoAVL<T> nuevaRaiz = rota(papa);
+        if (papaDePapa == null)
+          raiz = nuevaRaiz;
+        else {
+          if (papaDePapa.getDato().compareTo(nuevaRaiz.getDato()) > 0)
+            papaDePapa.setIzq(nuevaRaiz);
+          else
+            papaDePapa.setDer(nuevaRaiz);
 
+          nuevaRaiz.setPapa(papaDePapa);
+        }
+      }
       actual = papa;
     }
 
@@ -170,8 +183,9 @@ public class ArbolAVL<T extends Comparable<T>> {
 
   private NodoAVL<T> rota(NodoAVL<T> actual) {
     NodoAVL<T> alfa, beta, gamma, B, C, raiz;
+    raiz = actual;
     if (actual.getFactorEquilibrio() == -2 && actual.getIzq().getFactorEquilibrio() <= 0) { // Caso izq-izq
-      System.out.println("Caso izq-izq");
+      System.out.println("Rotación izq-izq");
       alfa = actual;
       beta = alfa.getIzq();
       gamma = beta.getIzq();
@@ -188,7 +202,7 @@ public class ArbolAVL<T extends Comparable<T>> {
 
       raiz = beta;
     } else if (actual.getFactorEquilibrio() == 2 && actual.getDer().getFactorEquilibrio() > 0) { // Caso der-der
-      System.out.println("Caso der-der");
+      System.out.println("Rotación izq-izq");
       alfa = actual;
       beta = alfa.getDer();
       gamma = beta.getDer();
@@ -205,7 +219,6 @@ public class ArbolAVL<T extends Comparable<T>> {
 
       raiz = beta;
     } else if (actual.getFactorEquilibrio() == -2 && actual.getIzq().getFactorEquilibrio() > 0) { // izq-der
-      System.out.println("Caso izq-der");
       alfa = actual;
       beta = alfa.getIzq();
       gamma = beta.getDer();
@@ -228,8 +241,7 @@ public class ArbolAVL<T extends Comparable<T>> {
       gamma.setPapa(null);
 
       raiz = gamma;
-    } else { // Caso der-izq
-      System.out.println("Caso der-izq");
+    } else if (actual.getFactorEquilibrio() == 2 && actual.getDer().getFactorEquilibrio() < 0) { // Caso der-izq
       alfa = actual;
       beta = alfa.getDer();
       gamma = beta.getIzq();
@@ -329,12 +341,10 @@ public class ArbolAVL<T extends Comparable<T>> {
 
   public static void main(String[] args) {
     ArbolAVL<Integer> arbol = new ArbolAVL();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 5; i++) {
       arbol.insertar(i);
     }
-
-    System.out.println(arbol.getRaiz().getDato());
-
+    arbol.borra(2);
   }
 
 }
