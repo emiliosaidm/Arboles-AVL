@@ -12,5 +12,3 @@ Este repositorio está dedicado a la implementación y estudio de árboles AVL, 
 
 - Implementaciones de árboles AVL en JAVA.
 - Explicaciones sobre cómo funcionan el algoritmo de balanceo.
-
-¡Explora el código y aprende más sobre este tema!
