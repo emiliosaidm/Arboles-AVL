@@ -67,16 +67,23 @@ public class ArbolAVL<T extends Comparable<T>> {
         papa.setFactorEquilibrio(papa.getFactorEquilibrio() - 1);
       if (papa.getFactorEquilibrio() == 0)
         termine = true;
+
       else if (Math.abs(papa.getFactorEquilibrio()) == 2) {
         // En este caso, ya habría un árbol desbalanceado. Por lo que hay que rotar.
-        papa = rota(papa);
-        if (papa.getPapa() == null)
-          raiz = papa;
+        NodoAVL<T> papaDePapa = papa.getPapa();
+        // Nueva raiz del subárbol, después de la rotación. Este logra balancear el
+        // árbol.
+        NodoAVL<T> nuevaRaiz = rota(papa);
+        System.out.println("papa de papa: " + (papaDePapa != null ? papaDePapa.getDato() : "null"));
+        if (papaDePapa == null)
+          raiz = nuevaRaiz;
         else {
-          if (papa.getPapa().getDato().compareTo(papa.getDato()) > 0)
-            papa.getPapa().setIzq(papa);
+          if (papaDePapa.getDato().compareTo(nuevaRaiz.getDato()) > 0)
+            papaDePapa.setIzq(nuevaRaiz);
           else
-            papa.getPapa().setDer(papa);
+            papaDePapa.setDer(nuevaRaiz);
+
+          nuevaRaiz.setPapa(papaDePapa);
         }
         termine = true;
       }
@@ -322,11 +329,11 @@ public class ArbolAVL<T extends Comparable<T>> {
 
   public static void main(String[] args) {
     ArbolAVL<Integer> arbol = new ArbolAVL();
-    arbol.insertar(1);
-    arbol.insertar(2);
-    arbol.insertar(3);
+    for (int i = 0; i < 10; i++) {
+      arbol.insertar(i);
+    }
 
-    System.out.println(arbol.toString());
+    System.out.println(arbol.getRaiz().getDato());
 
   }
 
