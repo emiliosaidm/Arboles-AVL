@@ -1,3 +1,6 @@
+import java.util.Queue;
+import java.util.LinkedList;
+
 public class ArbolAVL<T extends Comparable<T>> {
   NodoAVL<T> raiz;
   int cont;
@@ -15,7 +18,7 @@ public class ArbolAVL<T extends Comparable<T>> {
     return raiz;
   }
 
-  public void insertar(T elem) {
+  public void inserta(T elem) {
     // Si la raiz es vacia, se asigna el elemento a la raiz.
     if (raiz == null) {
       raiz = new NodoAVL<T>(elem);
@@ -311,19 +314,28 @@ public class ArbolAVL<T extends Comparable<T>> {
     return builder.toString();
   }
 
-  private void toString(NodoAVL<T> actual,
-      StringBuilder builder,
-      String prefix,
-      String childrenPrefix) {
-    if (actual != null) {
-      builder.append(prefix);
-      builder.append(actual.getDato() + " fe: " + actual.getFactorEquilibrio());
+  public String imprimePorNivel() {
+    if (raiz == null)
+      return "";
+    StringBuilder builder = new StringBuilder();
+    Queue<NodoAVL<T>> queue = new LinkedList<>();
+    queue.offer(raiz);
+    while (!queue.isEmpty()) {
+      int levelSize = queue.size();
+      for (int i = 0; i < levelSize; i++) {
+        NodoAVL<T> node = queue.poll();
+        builder.append(node.getDato())
+            .append(" (fe: ")
+            .append(node.getFactorEquilibrio())
+            .append(") ");
+        if (node.getIzq() != null)
+          queue.offer(node.getIzq());
+        if (node.getDer() != null)
+          queue.offer(node.getDer());
+      }
       builder.append("\n");
-
-      toString(actual.getIzq(), builder, childrenPrefix, childrenPrefix);
-      toString(actual.getDer(), builder, childrenPrefix, childrenPrefix);
     }
-
+    return builder.toString();
   }
 
   private int altura(NodoAVL<T> actual) {
@@ -339,10 +351,18 @@ public class ArbolAVL<T extends Comparable<T>> {
 
   public static void main(String[] args) {
     ArbolAVL<Integer> arbol = new ArbolAVL();
-    for (int i = 0; i < 5; i++) {
-      arbol.insertar(i);
-    }
-    arbol.borra(2);
+
+    arbol.inserta(100);
+    arbol.inserta(7);
+    arbol.inserta(23);
+    arbol.inserta(5);
+    arbol.inserta(4);
+    arbol.inserta(-10);
+    arbol.inserta(10);
+    arbol.inserta(6);
+    arbol.inserta(300);
+    arbol.inserta(88);
+    arbol.inserta(50);
 
     System.out.println(arbol.toString());
   }
